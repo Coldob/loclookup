@@ -15,8 +15,6 @@ except Error as e:
 class loclookup(Cmd):
     prompt = 'loclookup> '
     intro = "Welcome, to location lookup! Ƹ̵̡Ӝ̵̨̄,Ʒ\nhelp for commands"
-    def help_newcoord(self):
-        print("enter coords for square area to generate random location in ")
     def help_gen(self):
         print("generate a new random location based on location info")
     def help_newtable(self):
