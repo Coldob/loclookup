@@ -5,6 +5,8 @@ import os
 import random
 from decimal import Decimal
 con = sqlite3.connect('loc.db')
+con.enable_load_extension(True)
+con.enable_load_extension(False)
 con.row_factory = lambda cursor, row: row[0]
 cur = con.cursor()
 sqlite3.connect('loc.db')
@@ -15,12 +17,22 @@ except Error as e:
 class loclookup(Cmd):
     prompt = 'loclookup> '
     intro = "Welcome, to location lookup! Ƹ̵̡Ӝ̵̨̄,Ʒ\nhelp for commands"
+
     def help_gen(self):
         print("generate a new random location based on location info")
+
     def help_newtable(self):
         print("resets all saved locations for location data")
+
+    def help_list(self):
+        print("lists current saved locations in database")
+
     def help_newloc(self):
-        print("This is how you save a new square area")
+        print("records a square area into the database which is used to generate a random coordinate in")
+
+    def help_view(self):
+        print("usage view {name} lists coordinates associated with a database entry")
+
     def do_newtable(self, arg):
         try:
             con.execute("DROP TABLE location;")
@@ -32,6 +44,7 @@ class loclookup(Cmd):
             print(e)
         finally:
             print("Your location data has been reset!")
+
     def do_newloc(self,inp):
         print("Enter name for coordinate")
         title = input("Enter name here:")
@@ -42,13 +55,14 @@ class loclookup(Cmd):
         print("Enter corner of location (ex 123, 123)\nIt is usually easiest to copy and paste coordinate directly from google maps")
         x1, y1 = input("paste coordinates for first corner here: ").split(", ")
         x2, y2 = input("paste coordinates for second corner here: ").split(", ")
-        print("Location has been saved")
+        print("Location Saved!")
         con.executescript(f'insert into location (n, name, x1, x2, y1, y2) values ({nu}, "{title}", {x1}, {x2}, {y1}, {y2})')
     def do_gen(self, inp):
         cur.execute('SELECT n FROM location')
         num = cur.fetchall()
         end = int(max(num))
         sel = random.randint(1,end)
+        print("Here are your coordinates! :)")
         cur.execute(f'SELECT x1 FROM location WHERE n={sel};')
         h1 = str(cur.fetchall()).replace('[',"").replace(']',"")
         cur.execute(f'SELECT x2 FROM location WHERE n={sel};')
@@ -70,6 +84,24 @@ class loclookup(Cmd):
         else:
             yr = random.uniform(y1, y2)
         print(f'{xr}, {yr}')
+    def do_list(self, inp):
+        cur.execute('SELECT name FROM location')
+        print(cur.fetchall())
+
+    def do_view(self, sel):
+        #there is an optimized way of doing this but I keep running into an error :')
+        cur.execute(f"SELECT x1 FROM location WHERE name MATCH '%{sel}%';")
+        h1 = str(cur.fetchall()).replace('[',"").replace(']',"")
+        cur.execute(f"SELECT x2 FROM location WHERE name MATCH '%{sel}%';")
+        h2 = str(cur.fetchall()).replace('[',"").replace(']',"")
+        cur.execute(f"SELECT y1 FROM location WHERE name MATCH '%{sel}%';")
+        j1 = str(cur.fetchall()).replace('[',"").replace(']',"")
+        cur.execute(f"SELECT y2 FROM location WHERE name MATCH '%{sel}%';")
+        j2 = str(cur.fetchall()).replace('[',"").replace(']',"")
+        print(f'{sel}:[x1:{h1},y1:{j1},x2{h2},y2{j2}]')
+    def do_del(self, inp):
+        cur.execute(f"DELETE FROM location WHERE name MATCH '%{inp}%';")
+        print("Coordinates deleted!")
     def do_exit(self, inp):
         print("No place like home.")
         return True
