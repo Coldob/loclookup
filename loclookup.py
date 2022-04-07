@@ -12,7 +12,7 @@ cur = con.cursor()
 sqlite3.connect('loc.db')
 class loclookup(Cmd):
     prompt = 'loclookup> '
-    intro = "Welcome, to location lookup! Ƹ̵̡Ӝ̵̨̄,Ʒ\nhelp for commands"
+    intro = "Welcome, to location lookup! Ƹ̵̡Ӝ̵̨̄,Ʒ\n if the database is having issues delete it and Enter ts then newtable\nEnter help for commands"
     def help_sgen(self):
         print("this is for generating a random point in a single location format: sgen {name}")
 
@@ -65,11 +65,11 @@ class loclookup(Cmd):
             print("Enter corner of location (ex 123, 123)\nIt is usually easiest to copy and paste coordinate directly from google maps")
             x1, y1 = input("paste coordinates for first corner here: ").split(", ")
             x2, y2 = input("paste coordinates for second corner here: ").split(", ")
+            print("Location Saved!")
+            con.executescript(f'insert into location (n, name, x1, x2, y1, y2) values ({nu}, "{title}", {x1}, {x2}, {y1}, {y2})')
         except:
             print("coordinates must be numerals in the format #, #")
             return
-            print("Location Saved!")
-            con.executescript(f'insert into location (n, name, x1, x2, y1, y2) values ({nu}, "{title}", {x1}, {x2}, {y1}, {y2})')
     def do_gen(self, inp):
         cur.execute('SELECT n FROM location')
         num = cur.fetchall()
@@ -145,29 +145,27 @@ class loclookup(Cmd):
             return
         print("this coordinate does not exist\nOr no location was stated please use format view {name}")
     def do_del(self, inp):
-        cur.execute(f"SELECT n FROM location WHERE name MATCH '%{inp}%';")
+        cur.execute(f"SELECT n FROM location WHERE name MATCH '%{sel}%';")
         number = str(cur.fetchall()).replace('[',"").replace(']',"")
         if number.isnumeric():
-            cur.execute(f"DELETE FROM location WHERE name MATCH '%{inp}%';")
+            cur.execute(f"DELETE FROM location WHERE name MATCH '%{sel}%';")
             print("Coordinates deleted!")
             return
         print("This is not a saved datapoint\n Or no datapoint was entered")
     def do_exit(self, inp):
-        print("lifes a circus and I'm the clown")
         print("No place like home.")
         return True
 
     def help_exit(self, line):
-        print('exit the application. Shorthand: x q Ctrl-D.')
+        print('exit the application. Shorthand: x q or Ctrl-d.')
 
-    def do_add(self, inp):
+    def do_ts(self, inp):
         con.execute("create virtual table location using fts3(n, name, x1, y1, x2, y2)")
-    def help_add(self):
+    def help_ts(self):
         print("Add a new entry to the system.")
 
     def default(self, inp):
-        if inp == 'x' or inp == 'q':
-            print("lifes a circus and I'm the clown")
+        if inp == 'x' or inp == 'z':
             return self.do_exit(inp)
 
         print("Default: {}".format(inp))
