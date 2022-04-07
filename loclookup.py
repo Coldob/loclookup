@@ -145,10 +145,10 @@ class loclookup(Cmd):
             return
         print("this coordinate does not exist\nOr no location was stated please use format view {name}")
     def do_del(self, inp):
-        cur.execute(f"SELECT n FROM location WHERE name MATCH '%{sel}%';")
+        cur.execute(f"SELECT n FROM location WHERE name MATCH '%{inp}%';")
         number = str(cur.fetchall()).replace('[',"").replace(']',"")
         if number.isnumeric():
-            cur.execute(f"DELETE FROM location WHERE name MATCH '%{sel}%';")
+            cur.execute(f"DELETE FROM location WHERE name MATCH '%{inp}%';")
             print("Coordinates deleted!")
             return
         print("This is not a saved datapoint\n Or no datapoint was entered")
