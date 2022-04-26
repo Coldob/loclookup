@@ -41,6 +41,7 @@ class loclookup(Cmd):
         comp = random.randint(0,364)
         print("Compass Direction:", comp)
 
+#this is the code for resetting the entire sql table can be optimized
     def do_newtable(self, arg):
         try:
             con.execute("DROP TABLE location;")
@@ -52,6 +53,7 @@ class loclookup(Cmd):
             print(e)
         finally:
             print("Your location data has been reset!")
+#this is how you set a new location to be saved to database
     def do_newloc(self,inp):
         try:
             print("Enter name for coordinate")
@@ -70,6 +72,7 @@ class loclookup(Cmd):
         except:
             print("coordinates must be numerals in the format #, #")
             return
+#this gens a random coordinate from the locations saved
     def do_gen(self, inp):
         cur.execute('SELECT n FROM location')
         num = cur.fetchall()
@@ -97,6 +100,7 @@ class loclookup(Cmd):
         else:
             yr = random.uniform(y1, y2)
         print(f'{xr}, {yr}')
+# this gens a random coordinate within the location you have selected
     def do_sgen(self, inp):
             cur.execute(f"SELECT n FROM location WHERE name MATCH '%{inp}%';")
             number = str(cur.fetchall()).replace('[',"").replace(']',"")
@@ -125,10 +129,11 @@ class loclookup(Cmd):
                 print(f'{xr}, {yr}')
                 return
             print("This location does not exist\nOr no location was stated please use format sgen {name}")
+#this lists the locations that have been saved by name
     def do_list(self, inp):
         cur.execute('SELECT name FROM location')
         print(cur.fetchall())
-
+#this shows you the coordinates saved for one location
     def do_view(self, sel):
         cur.execute(f"SELECT n FROM location WHERE name MATCH '%{sel}%';")
         number = str(cur.fetchall()).replace('[',"").replace(']',"")
@@ -144,6 +149,7 @@ class loclookup(Cmd):
             print(f'{sel}:[x1:{h1},y1:{j1},x2:{h2},y2:{j2}]')
             return
         print("this coordinate does not exist\nOr no location was stated please use format view {name}")
+#this is how you delete a single location that has been saved in the database
     def do_del(self, inp):
         cur.execute(f"SELECT n FROM location WHERE name MATCH '%{inp}%';")
         number = str(cur.fetchall()).replace('[',"").replace(']',"")
@@ -152,13 +158,15 @@ class loclookup(Cmd):
             print("Coordinates deleted!")
             return
         print("This is not a saved datapoint\n Or no datapoint was entered")
+#exit command
     def do_exit(self, inp):
         print("No place like home.")
         return True
 
     def help_exit(self, line):
         print('exit the application. Shorthand: x q or Ctrl-d.')
-
+#ts for trouble shoot this is how you start the program after table is made it sets the table newloc should be entered after this command
+#there is a better way to do this but sadly I have to focus on other coursework
     def do_ts(self, inp):
         con.execute("create virtual table location using fts3(n, name, x1, y1, x2, y2)")
     def help_ts(self):
