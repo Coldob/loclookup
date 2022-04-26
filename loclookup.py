@@ -168,9 +168,13 @@ class loclookup(Cmd):
 #ts for trouble shoot this is how you start the program after table is made it sets the table newloc should be entered after this command
 #there is a better way to do this but sadly I have to focus on other coursework
     def do_ts(self, inp):
-        con.execute("create virtual table location using fts3(n, name, x1, y1, x2, y2)")
+        try:
+            con.execute("create virtual table location using fts3(n, name, x1, y1, x2, y2)")
+        except:
+            print("Table already exists")
+            return
     def help_ts(self):
-        print("Add a new entry to the system.")
+        print("creates a new virtual table this command was made for first time setup")
 
     def default(self, inp):
         if inp == 'x' or inp == 'z':
