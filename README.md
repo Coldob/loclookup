@@ -7,5 +7,5 @@ This is a script for a python shell to generate random coordinates within a save
   - enter command >newtable
 ## Information on how to use
   - enter >help
-<br>to view information on a specific command
+### to view information on a specific command
   - enter >help 'command'
